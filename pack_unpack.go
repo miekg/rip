@@ -51,6 +51,8 @@ func unpackRoute1(packet []byte, off int) (r *Route1, off1 int, err error) {
 	if off == len(packet) {
 		return r, off, nil
 	}
+	r = new(Route1)
+
 	r.Family, off, err = unpackUint16(packet, off)
 	if err != nil {
 		return r, len(packet), err
@@ -82,6 +84,8 @@ func (r *Route2) pack(packet []byte, off int) (off1 int, err error) {
 	if off == len(packet) {
 		return off, nil
 	}
+	r = new(Route2)
+
 	off, err = packUint16(r.Family, packet, off)
 	if err != nil {
 		return len(packet), err
@@ -98,7 +102,7 @@ func (r *Route2) pack(packet []byte, off int) (off1 int, err error) {
 	if err != nil {
 		return len(packet), err
 	}
-	off, err = packUint32(r.NextHop, packet, off)
+	off, err = packIP(r.NextHop, packet, off)
 	if err != nil {
 		return len(packet), err
 	}
@@ -129,7 +133,7 @@ func unpackRoute2(packet []byte, off int) (r *Route2, off1 int, err error) {
 	if err != nil {
 		return r, len(packet), err
 	}
-	r.NextHop, off, err = unpackUint32(packet, off)
+	r.NextHop, off, err = unpackIP(packet, off)
 	if err != nil {
 		return r, len(packet), err
 	}

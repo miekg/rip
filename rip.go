@@ -30,11 +30,41 @@ func (p *Packet) Len() int {
 	return l
 }
 
+func (p *Packet) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	s := p.Header.String()
+	for i, r := range p.Routes {
+		switch p.Header.Version {
+		case One:
+			s += fmt.Sprintf("%d. %s", i+1, r.Route1.String())
+		case Two:
+			s += fmt.Sprintf("%d. %s", i+1, r.Route2.String())
+		}
+	}
+	return s
+}
+
 // Header is the packet's Header in the RIP version 2 protocol.
 type Header struct {
 	Command uint8
 	Version uint8
 	mbz     uint16
+}
+
+func (h Header) String() string {
+	s := ";; ->>HEADER<<- "
+	switch h.Command {
+	case Request:
+		s += "command: request"
+	case Response:
+		s += "command: response"
+	default:
+		s += fmt.Sprintf("command: %d", h.Command)
+	}
+	s += fmt.Sprintf(", version: %d\n", h.Version)
+	return s
 }
 
 // Route is a RIP-1 or RIP-2 Route Entry.
@@ -55,17 +85,33 @@ type Route1 struct {
 
 func (r1 *Route1) len() int { return 20 }
 
+func (r1 *Route1) String() string {
+	if r1 == nil {
+		return ""
+	}
+	s := r1.Addr.String()
+	return s + "\n"
+}
+
 // Route2 is a RIP-2 Route Entry.
 type Route2 struct {
 	Family   uint16
 	RouteTag uint16
 	Addr     net.IP
 	Mask     uint32
-	NextHop  uint32
+	NextHop  net.IP
 	Metric   uint32
 }
 
 func (r2 *Route2) len() int { return 20 }
+
+func (r2 *Route2) String() string {
+	if r2 == nil {
+		return ""
+	}
+	s := r2.Addr.String()
+	return s + "\n"
+}
 
 // Authentication is used for authentication purposes. This has not been implemented.
 type Authentication struct {
@@ -122,6 +168,7 @@ Unpack:
 	default:
 		return nil, &ProtoError{err: fmt.Sprintf("%s: %d", "bad rip packet: wrong version", p.Header.Version)}
 	}
+	p.Routes = routes
 
 	if i == 0 {
 		return nil, &ProtoError{err: "bad rip packet: 0 route entries"}
