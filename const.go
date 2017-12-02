@@ -13,4 +13,6 @@ const (
 	Response = 2 // Header commands with this value are responses.
 
 	Infinity = 16 // Infinity in the Metrics.
+
+	Port = 520 // IANA assigned port for RIP.
 )

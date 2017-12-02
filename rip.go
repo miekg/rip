@@ -110,6 +110,9 @@ func (r2 *Route2) String() string {
 		return ""
 	}
 	s := r2.Addr.String()
+	if r2.NextHop != nil {
+		s += " ->" + r2.NextHop.String()
+	}
 	return s + "\n"
 }
 
