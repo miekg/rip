@@ -47,62 +47,124 @@ func (h Header) pack(packet []byte, off int) (off1 int, err error) {
 	return off, nil
 }
 
-func unpackEntry(packet []byte, off int) (e Entry, off1 int, err error) {
+func unpackRoute1(packet []byte, off int) (r *Route1, off1 int, err error) {
 	if off == len(packet) {
-		return e, off, nil
+		return r, off, nil
 	}
-	e.Family, off, err = unpackUint16(packet, off)
+	r.Family, off, err = unpackUint16(packet, off)
 	if err != nil {
-		return e, len(packet), err
+		return r, len(packet), err
 	}
-	e.mbz1, off, err = unpackUint16(packet, off)
+	r.mbz1, off, err = unpackUint16(packet, off)
 	if err != nil {
-		return e, len(packet), err
+		return r, len(packet), err
 	}
-	e.Addr, off, err = unpackIP(packet, off)
+	r.Addr, off, err = unpackIP(packet, off)
 	if err != nil {
-		return e, len(packet), err
+		return r, len(packet), err
 	}
-	e.mbz2, off, err = unpackUint32(packet, off)
+	r.mbz2, off, err = unpackUint32(packet, off)
 	if err != nil {
-		return e, len(packet), err
+		return r, len(packet), err
 	}
-	e.mbz3, off, err = unpackUint32(packet, off)
+	r.mbz3, off, err = unpackUint32(packet, off)
 	if err != nil {
-		return e, len(packet), err
+		return r, len(packet), err
 	}
-	e.Metric, off, err = unpackUint32(packet, off)
+	r.Metric, off, err = unpackUint32(packet, off)
 	if err != nil {
-		return e, len(packet), err
+		return r, len(packet), err
 	}
-	return e, off, nil
+	return r, off, nil
 }
 
-func (e Entry) pack(packet []byte, off int) (off1 int, err error) {
+func (r *Route2) pack(packet []byte, off int) (off1 int, err error) {
 	if off == len(packet) {
 		return off, nil
 	}
-	off, err = packUint16(e.Family, packet, off)
+	off, err = packUint16(r.Family, packet, off)
 	if err != nil {
 		return len(packet), err
 	}
-	off, err = packUint16(e.mbz1, packet, off)
+	off, err = packUint16(r.RouteTag, packet, off)
 	if err != nil {
 		return len(packet), err
 	}
-	off, err = packIP(e.Addr, packet, off)
+	off, err = packIP(r.Addr, packet, off)
 	if err != nil {
 		return len(packet), err
 	}
-	off, err = packUint32(e.mbz2, packet, off)
+	off, err = packUint32(r.Mask, packet, off)
 	if err != nil {
 		return len(packet), err
 	}
-	off, err = packUint32(e.mbz3, packet, off)
+	off, err = packUint32(r.NextHop, packet, off)
 	if err != nil {
 		return len(packet), err
 	}
-	off, err = packUint32(e.Metric, packet, off)
+	off, err = packUint32(r.Metric, packet, off)
+	if err != nil {
+		return len(packet), err
+	}
+	return off, nil
+}
+
+func unpackRoute2(packet []byte, off int) (r *Route2, off1 int, err error) {
+	if off == len(packet) {
+		return r, off, nil
+	}
+	r.Family, off, err = unpackUint16(packet, off)
+	if err != nil {
+		return r, len(packet), err
+	}
+	r.RouteTag, off, err = unpackUint16(packet, off)
+	if err != nil {
+		return r, len(packet), err
+	}
+	r.Addr, off, err = unpackIP(packet, off)
+	if err != nil {
+		return r, len(packet), err
+	}
+	r.Mask, off, err = unpackUint32(packet, off)
+	if err != nil {
+		return r, len(packet), err
+	}
+	r.NextHop, off, err = unpackUint32(packet, off)
+	if err != nil {
+		return r, len(packet), err
+	}
+	r.Metric, off, err = unpackUint32(packet, off)
+	if err != nil {
+		return r, len(packet), err
+	}
+	return r, off, nil
+}
+
+func (r *Route1) pack(packet []byte, off int) (off1 int, err error) {
+	if off == len(packet) {
+		return off, nil
+	}
+	off, err = packUint16(r.Family, packet, off)
+	if err != nil {
+		return len(packet), err
+	}
+	off, err = packUint16(r.mbz1, packet, off)
+	if err != nil {
+		return len(packet), err
+	}
+	off, err = packIP(r.Addr, packet, off)
+	if err != nil {
+		return len(packet), err
+	}
+	off, err = packUint32(r.mbz2, packet, off)
+	if err != nil {
+		return len(packet), err
+	}
+	off, err = packUint32(r.mbz3, packet, off)
+	if err != nil {
+		return len(packet), err
+	}
+	off, err = packUint32(r.Metric, packet, off)
 	if err != nil {
 		return len(packet), err
 	}
