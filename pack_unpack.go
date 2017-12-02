@@ -117,6 +117,8 @@ func unpackRoute2(packet []byte, off int) (r *Route2, off1 int, err error) {
 	if off == len(packet) {
 		return r, off, nil
 	}
+	r = new(Route2)
+
 	r.Family, off, err = unpackUint16(packet, off)
 	if err != nil {
 		return r, len(packet), err
@@ -235,9 +237,13 @@ func packIP(a net.IP, msg []byte, off int) (int, error) {
 	if off+net.IPv4len > len(msg) {
 		return len(msg), &PackError{err: "overflow packing Addr"}
 	}
+
 	switch len(a) {
 	case net.IPv4len, net.IPv6len:
 		copy(msg[off:], a.To4())
+		off += net.IPv4len
+	case 0:
+		// Not set, skip it
 		off += net.IPv4len
 	default:
 		return len(msg), &PackError{err: "overflow packing Addr"}
