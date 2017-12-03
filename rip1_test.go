@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 package rip
 
 import (
