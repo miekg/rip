@@ -11,8 +11,7 @@ func ExampleStringer2() {
 	p.Command = Response
 	p.Version = Two
 
-	r2 := &Route2{Addr: net.ParseIP("127.0.0.1"), Family: 2, Metric: 1, NextHop: net.ParseIP("127.0.0.53")}
-	p.Routes = append(p.Routes, &Route{Route2: r2})
+	p.Routes = append(p.Routes, NewRoute(net.ParseIP("127.0.0.1"), net.ParseIP("127.0.0.53"), 0, 1, 0))
 
 	fmt.Println(p.String())
 	// Output:
@@ -21,12 +20,9 @@ func ExampleStringer2() {
 }
 
 func packet2() *Packet {
-	p := new(Packet)
-	p.Command = Response
-	p.Version = Two
+	p := New(Response, Two)
 
-	r2 := &Route2{Addr: net.ParseIP("127.0.0.1"), Family: 2, Metric: 1, NextHop: net.ParseIP("127.0.0.53")}
-	p.Routes = append(p.Routes, &Route{Route2: r2})
+	p.Routes = append(p.Routes, NewRoute(net.ParseIP("127.0.0.1"), net.ParseIP("127.0.0.53"), 0, 1, 0))
 	return p
 }
 

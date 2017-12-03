@@ -2,7 +2,6 @@ package rip
 
 import (
 	"fmt"
-	"net"
 )
 
 // Packet is a packet that is being exchanged in the RIP protocol. This contains
@@ -13,6 +12,14 @@ type Packet struct {
 	// Routes contains all the routes. Each *Route either contains a *Route1
 	// or a Route2 depending in the version in the header.
 	Routes []*Route
+}
+
+// New returns a pointer to a Packet with an intialized header.
+func New(command, version int) *Packet {
+	h := Header{Command: uint8(command), Version: uint8(version)}
+	p := &Packet{Header: h}
+
+	return p
 }
 
 // Len returns the length of p in octets.
@@ -65,55 +72,6 @@ func (h Header) String() string {
 	}
 	s += fmt.Sprintf(", version: %d\n", h.Version)
 	return s
-}
-
-// Route is a RIP-1 or RIP-2 Route Entry.
-type Route struct {
-	*Route1
-	*Route2
-}
-
-// Route1 is a RIP-1 Route Entry.
-type Route1 struct {
-	Family uint16
-	mbz1   uint16
-	Addr   net.IP
-	mbz2   uint32
-	mbz3   uint32
-	Metric uint32
-}
-
-func (r1 *Route1) len() int { return 20 }
-
-func (r1 *Route1) String() string {
-	if r1 == nil {
-		return ""
-	}
-	s := r1.Addr.String()
-	return s + "\n"
-}
-
-// Route2 is a RIP-2 Route Entry.
-type Route2 struct {
-	Family   uint16
-	RouteTag uint16
-	Addr     net.IP
-	Mask     uint32
-	NextHop  net.IP
-	Metric   uint32
-}
-
-func (r2 *Route2) len() int { return 20 }
-
-func (r2 *Route2) String() string {
-	if r2 == nil {
-		return ""
-	}
-	s := r2.Addr.String()
-	if r2.NextHop != nil {
-		s += " ->" + r2.NextHop.String()
-	}
-	return s + "\n"
 }
 
 // Authentication is used for authentication purposes. This has not been implemented.
