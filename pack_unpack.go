@@ -84,7 +84,6 @@ func (r *Route2) pack(packet []byte, off int) (off1 int, err error) {
 	if off == len(packet) {
 		return off, nil
 	}
-	r = new(Route2)
 
 	off, err = packUint16(r.Family, packet, off)
 	if err != nil {
